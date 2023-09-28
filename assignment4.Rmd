@@ -53,6 +53,7 @@ df <- read_csv("all-states-history.csv")
 
 - Use the below codes to create `month`, `weekday` and `monthday` variables
 
+
 ```{r}
 library(lubridate)
 df$year = year(df$date)
@@ -120,9 +121,6 @@ x %>%
 
 x %>% 
   log(sum(sqroot))
-
-# log base 2 of 16
-log(16, 2)
 
 ```
 
