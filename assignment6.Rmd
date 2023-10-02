@@ -1,0 +1,151 @@
+
+---
+output: 
+  html_document:
+  pdf_document: default
+  word_document: default
+title: "Assignment 6: Visualization - Aesthetic Mapping"
+---
+
+***How to do it?***: 
+
+- Open the Rmarkdown file of this assignment ([link](assignment6.Rmd)) in Rstudio. 
+
+- Right under each **question**, insert  a code chunk (you can use the hotkey `Ctrl + Alt + I` to add a code chunk) and code the solution for the question. 
+
+- `Knit` the rmarkdown file (hotkey: `Ctrl + Alt + K`) to export an html.  
+
+-  Publish the html file to your Githiub Page. 
+
+***Submission***: Submit the link on Github of the assignment to Canvas.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+```
+
+-------
+
+### Questions on Your Selected Data
+
+Choose a dataset and produce the following types of plots and comment on each plot. Plots should be meaningful. If you use the data we used in class, make sure the plots are not the same as the ones in the slides. 
+
+```{r}
+library(tidyverse)
+df <- read_csv('aircrashesFullData.csv')
+colnames(df) <- c("Year", "Quarter", "Month",
+                  "Day", "Country_Region",
+                  "Aircraft_Manufacturer",
+                  "Aircraft", "Location", "Operator",
+                  "Sum_Ground", "Sum_Fatal", "Sum_Aboard")
+```
+
+-------
+
+1. For one continuous variable:
+
+- Density
+
+- Histogram 
+
+- Boxplot
+
+```{r}
+histogram <- df %>% ggplot() +
+  geom_histogram(mapping = aes(x=Sum_Fatal))
+
+show(histogram)
+```
+
+
+-------
+
+2. For one categorical variable
+
+- Barplot
+
+```{r}
+barPlot <- df %>% 
+  ggplot() + 
+  geom_bar(mapping = aes(x = Quarter))
+
+show(barPlot)
+```
+
+
+-------
+
+3. For two continuous variables
+
+- Scatter Plot
+
+- Line Plot
+
+- Smooth Plot
+
+```{r}
+scatter <- df %>%
+  ggplot() +
+  geom_point(mapping = aes(x=Sum_Fatal, y=Sum_Aboard))
+
+show(scatter)
+```
+
+-------
+
+4. For one continuous + one categorical variables
+
+- Density
+
+- BoxPlot
+
+```{r}
+boxPlt <- df %>%
+  ggplot() + 
+  geom_boxplot(mapping = aes(x = Quarter, y = Sum_Fatal))
+
+show(boxPlt)
+```
+
+-------
+
+5. For two categorical variables: barplot
+
+```{r}
+
+us_states <- c(
+  "Alabama", "Alaska", "Arizona", "Arkansas", "California",
+  "Colorado", "Connecticut", "Delaware", "Florida", "Georgia",
+  "Hawaii", "Idaho", "Illinois", "Indiana", "Iowa",
+  "Kansas", "Kentucky", "Louisiana", "Maine", "Maryland",
+  "Massachusetts", "Michigan", "Minnesota", "Mississippi", "Missouri",
+  "Montana", "Nebraska", "Nevada", "New Hampshire", "New Jersey",
+  "New Mexico", "New York", "North Carolina", "North Dakota", "Ohio",
+  "Oklahoma", "Oregon", "Pennsylvania", "Rhode Island", "South Carolina",
+  "South Dakota", "Tennessee", "Texas", "Utah", "Vermont",
+  "Virginia", "Washington", "West Virginia", "Wisconsin", "Wyoming"
+)
+
+df$Country_Region <- if_else(df$Country_Region %in% us_states, "US", "Other")
+```
+
+
+```{r}
+barPlot_2 <- df %>%
+  ggplot() + 
+  geom_bar(mapping=aes(x=Month, fill=Country_Region), position='fill')
+
+show(barPlot_2)
+```
+
+-------
+
+6. A plot that contains three variables
+
+```{r}
+three_var <- df %>%
+  ggplot() +
+  geom_point(aes(x=Sum_Fatal, y=Sum_Aboard, color=Year))
+
+show(three_var)
+```
+
