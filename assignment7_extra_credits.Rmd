@@ -1,0 +1,183 @@
+
+---
+output: 
+  html_document:
+  pdf_document: default
+  word_document: default
+title: "Assignment 7 - Extra Credits: Practice dplyr and ggplot2"
+---
+
+***How to do it?***: 
+
+- Open the Rmarkdown file of this assignment ([link](assignment7_extra_credits.Rmd)) in Rstudio. 
+
+- Right under each **question**, insert  a code chunk (you can use the hotkey `Ctrl + Alt + I` to add a code chunk) and code the solution for the question. 
+
+- `Knit` the rmarkdown file (hotkey: `Ctrl + Alt + K`) to export an html.  
+
+-  Publish the html file to your Githiub Page. 
+
+***Submission***: Submit the link on Github of the assignment to Canvas
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+-------
+
+1. Import the data at https://bryantstats.github.io/math421/data/ds_salaries.csv
+
+    The data description can be found at https://www.kaggle.com/datasets/saurabhshahane/data-science-jobs-salaries
+    
+```{r}
+library(tidyverse)
+df <- read_csv('https://bryantstats.github.io/math421/data/ds_salaries.csv')
+```
+
+2. Is there any column that contains NAs?
+
+```{r}
+# No columns have any null values
+colSums(is.na(df))
+```
+3. What is the most frequent job title in the data?
+
+```{r}
+# Data Scientist
+df %>%
+  group_by(job_title) %>%
+  count() %>%
+  arrange(-n) %>%
+  head(3)
+```
+
+4. Find the average salary data of the three most frequent job titles in the data. 
+
+```{r}
+df %>%
+  filter(job_title == "Data Scientist" |
+         job_title == "Data Engineer" |
+         job_title == "Data Analyst") %>%
+  group_by(job_title) %>%
+  summarise(mean_salary = mean(salary_in_usd, na.rm=TRUE)) %>%
+  arrange(-mean_salary)
+```
+
+5. What is the job title that have the highest average salary?
+
+```{r}
+# Data Analytics Lead
+df %>%
+  group_by(job_title) %>%
+  summarise(mean_salary = mean(salary_in_usd)) %>%
+  arrange(-mean_salary) %>%
+  head(1)
+```
+
+6. Which country gives the highest salary on average? 
+
+```{r}
+# Russia
+df %>%
+  group_by(company_location) %>%
+  summarise(mean_salary = mean(salary_in_usd)) %>%
+  arrange(-mean_salary) %>%
+  head(1)
+```
+
+7. Plot five meaningful plots. All plots should have title, caption, and appropriate labels.
+
+```{r}
+df_plot_1 <- df %>%
+  filter(job_title == "Data Scientist" |
+         job_title == "Data Engineer" |
+         job_title == "Data Analyst") %>%
+  group_by(job_title) %>%
+  summarise(mean_sal = mean(salary_in_usd)) %>%
+  ggplot() +
+  geom_bar(mapping = aes(x = job_title, y = mean_sal), stat = "identity") + 
+  labs(x = 'Job Title',
+       y = 'Mean Salary',
+       title = 'Top 3 Most Frequent Jobs Average Salary',
+       caption = 'Top 3 Jobs Listed in Current Dataset.')
+
+show(df_plot_1)
+```
+
+```{r}
+df_dateeng <- df %>% filter(job_title == "Data Engineer") %>%
+  group_by(work_year) %>%
+  summarise(mean_DE_sal = mean(salary_in_usd))
+
+df_datesci <- df %>% filter(job_title == "Data Scientist") %>%
+  group_by(work_year) %>%
+  summarise(mean_DS_sal = mean(salary_in_usd))
+
+df_dateana <- df %>% filter(job_title == "Data Analyst") %>%
+  group_by(work_year) %>%
+  summarise(mean_AN_sal = mean(salary_in_usd))
+
+df_alljobs <- df %>% filter(job_title != "Data Scientist" &
+                     job_title != "Data Analyst" &
+                     job_title != "Data Engineer") %>%
+  group_by(work_year) %>%
+  summarise(mean_alljobs_salary = mean(salary_in_usd))
+
+merged_df <- df_alljobs %>%
+  merge(df_dateana, by='work_year', all=TRUE) %>%
+  merge(df_dateeng, by='work_year', all=TRUE) %>%
+  merge(df_datesci, by='work_year', all=TRUE)
+
+df_plot_2 <- ggplot(merged_df, aes(x = work_year)) +
+  geom_line(aes(y = mean_alljobs_salary, color = "All Other Jobs"), linetype = "dashed") +
+  geom_line(aes(y = mean_AN_sal, color = "Data Analyst")) +
+  geom_line(aes(y = mean_DE_sal, color = "Data Engineer")) +
+  geom_line(aes(y = mean_DS_sal, color = "Data Scientist")) +
+  labs(x='Year',
+       y='Mean Salary',
+       title='Average Data Engineer Salary by Year',
+       caption='Data Engineering having the highest average salary among the three most commonly listed jobs.')+
+  scale_x_continuous(breaks = seq(2020, 2022, by = 1))
+
+show(df_plot_2)
+```
+
+```{r}
+df %>% ggplot() +
+  geom_histogram(mapping = aes(x=salary_in_usd)) +
+  labs(x = 'Salary',
+       y = 'Count',
+       title = 'Salary Distribution for Dataset',
+       caption = 'Distribution illustrtaes majority of salaries are within $200,000.')
+```
+
+```{r}
+df %>%
+  group_by(company_size) %>%
+  summarise(mean_salary = mean(salary_in_usd)) %>%
+  ggplot() + 
+  geom_bar(mapping = aes(x = company_size, y = mean_salary), stat = "identity") +
+  labs(x = 'Company Size',
+       y = 'Mean Salary',
+       title = 'Mean Salary by Company Size',
+       caption = 'Large, medium sized companies hold a very similar average salary.')
+```
+```{r}
+head(df)
+
+df %>%
+  group_by(company_size, employment_type) %>%
+  summarise(mean_salary = mean(salary_in_usd)) %>%
+  ggplot() + 
+  geom_bar(mapping = aes(x = company_size, y = mean_salary, fill=employment_type), 
+           stat = "identity", position='dodge') + 
+  labs(x='Company Size',
+       y='Salary',
+       title='Salary by Company Size, Employment Type',
+       caption = 'CT employment holds a larger average salary for smaller companies.')
+```
+
+
+
