@@ -16,3 +16,4 @@
 - [Assignment 7 Extra Credit](assignment7_extra_credits.html)
 - [Assignment 8](assignment8.html)
 - [Assignment 9](assignment9.html)
+- [Assignment 9 Extra Credit](assignment9_extra_credits.html)
