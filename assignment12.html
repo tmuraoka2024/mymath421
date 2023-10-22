@@ -406,7 +406,7 @@ cm1 &lt;- confusionMatrix(data = pred, reference = df_test$target, positive = &q
 
 cm1$overall[1]</code></pre>
 <pre><code>##  Accuracy 
-## 0.7826087</code></pre>
+## 0.7565217</code></pre>
 <ol start="2" style="list-style-type: decimal">
 <li>Use the <code>PimaIndiansDiabetes</code> dataset. Go to <a href="https://topepo.github.io/caret/available-models.html" class="uri">https://topepo.github.io/caret/available-models.html</a> and
 pick a classification model. Tune the classification model using
@@ -421,14 +421,15 @@ cm &lt;- confusionMatrix(data = pred, reference = df_test$target, positive = &qu
 
 cm$overall[1]</code></pre>
 <pre><code>##  Accuracy 
-## 0.7217391</code></pre>
+## 0.7043478</code></pre>
 <ol start="3" style="list-style-type: decimal">
 <li>(Model Comparison) Use the <code>PimaIndiansDiabetes</code> dataset.
 Pick two models at <a href="https://topepo.github.io/caret/available-models.html">this
 link</a> to compare using 7-fold cross validation method. Evaluate the
 accuracy of the final model on the test data.</li>
 </ol>
-<pre class="r"><code>library(ipred)
+<pre class="r"><code># treebag model
+library(ipred)
 library(plyr)
 library(e1071)
 
@@ -441,8 +442,9 @@ cm &lt;- confusionMatrix(data = pred, reference = df_test$target, positive = &qu
 
 cm$overall[1]</code></pre>
 <pre><code>##  Accuracy 
-## 0.7478261</code></pre>
-<pre class="r"><code>trControl = trainControl(method = &quot;cv&quot;, number = 7)
+## 0.7130435</code></pre>
+<pre class="r"><code># svmLinear model
+trControl = trainControl(method = &quot;cv&quot;, number = 7)
 
 svm_model &lt;- train(target ~ ., data = df_train, method = &quot;svmLinear&quot;, trControl = trControl)
 
@@ -453,6 +455,8 @@ cm &lt;- confusionMatrix(data = pred, reference = df_test$target, positive = &qu
 cm$overall[1]</code></pre>
 <pre><code>## Accuracy 
 ## 0.773913</code></pre>
+<p>svmLinear model performed slightly better than that of the treebag
+model.</p>
 
 
 

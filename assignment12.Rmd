@@ -80,6 +80,7 @@ cm$overall[1]
 3. (Model Comparison) Use the `PimaIndiansDiabetes` dataset. Pick two models at [this link](https://topepo.github.io/caret/available-models.html) to compare using 7-fold cross validation method. Evaluate the accuracy of the final model on the test data. 
 
 ```{r}
+# treebag model
 library(ipred)
 library(plyr)
 library(e1071)
@@ -96,6 +97,7 @@ cm$overall[1]
 ```
 
 ```{r}
+# svmLinear model
 trControl = trainControl(method = "cv", number = 7)
 
 svm_model <- train(target ~ ., data = df_train, method = "svmLinear", trControl = trControl)
@@ -106,4 +108,5 @@ cm <- confusionMatrix(data = pred, reference = df_test$target, positive = "pos")
 
 cm$overall[1]
 ```
+svmLinear model performed slightly better than that of the treebag model. 
 
