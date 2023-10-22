@@ -11,7 +11,7 @@
 
 
 
-<title>README</title>
+<title>Assignment 12: Predictive Modeling - Part 3</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -348,41 +348,111 @@ display: none;
 
 
 
+<h1 class="title toc-ignore">Assignment 12: Predictive Modeling - Part
+3</h1>
 
 </div>
 
 
-<div id="math-421-statistical-analysis-with-r" class="section level1">
-<h1>Math 421: Statistical Analysis with R</h1>
-<div id="trey-muraoka" class="section level2">
-<h2>Trey Muraoka</h2>
-</div>
-<div id="assignments" class="section level2">
-<h2>Assignments</h2>
+<p><strong><em>How to do it?</em></strong>:</p>
 <ul>
-<li><a href="assignment1.html">Assignment 1</a></li>
-<li><a href="assignment2.html">Assignment 2</a></li>
-<li><a href="assignment3.html">Assignment 3</a></li>
-<li><a href="assignment4.html">Assignment 4</a></li>
-<li><a href="assignment4_extra_credits.html">Assignment 4 Extra
-Credit</a></li>
-<li><a href="assignment5.html">Assignment 5</a></li>
-<li><a href="assignment5_extra_credits.html">Assignment 5 Extra
-Credit</a></li>
-<li><a href="assignment6.html">Assignment 6</a></li>
-<li><a href="assignment7.html">Assignment 7</a></li>
-<li><a href="assignment7_extra_credits.html">Assignment 7 Extra
-Credit</a></li>
-<li><a href="assignment8.html">Assignment 8</a></li>
-<li><a href="assignment9.html">Assignment 9</a></li>
-<li><a href="assignment9_extra_credits.html">Assignment 9 Extra
-Credit</a></li>
-<li><a href="assignment10.html">Assignment 10</a></li>
-<li><a href="assignment11.html">Assignment 11</a></li>
-<li><a href="assignment12.html">Assignment 12</a></li>
+<li><p>Open the Rmarkdown file of this assignment (<a href="assignment12.Rmd">link</a>) in Rstudio.</p></li>
+<li><p>Right under each <strong>question</strong>, insert a code chunk
+(you can use the hotkey <code>Ctrl + Alt + I</code> to add a code chunk)
+and code the solution for the question.</p></li>
+<li><p><code>Knit</code> the rmarkdown file (hotkey:
+<code>Ctrl + Alt + K</code>) to export an html.</p></li>
+<li><p>Publish the html file to your Githiub Page.</p></li>
 </ul>
-</div>
-</div>
+<p><strong><em>Submission</em></strong>: Submit the link on Github of
+the assignment to Blackboard.</p>
+<ol style="list-style-type: decimal">
+<li>Use the <code>PimaIndiansDiabetes</code> dataset. Use 15% data for
+testing. Use cross-validation with of 7 folds to tune random forest
+<code>(method=&#39;ranger&#39;)</code>. What are the parameters that produce the
+greatest accuracy? What is the testing accuracy.</li>
+</ol>
+<pre class="r"><code>library(mlbench)
+library(tibble)
+library(dplyr)
+
+data(PimaIndiansDiabetes)
+df &lt;- tibble(PimaIndiansDiabetes)
+
+df &lt;- df %&gt;% 
+  rename(target = diabetes) %&gt;%
+  mutate(target = as.factor(target))</code></pre>
+<pre class="r"><code>library(caret)
+
+splitIndex &lt;- createDataPartition(df$target, p = .85, 
+                                  list = FALSE)
+df_train &lt;- df[ splitIndex,]
+df_test &lt;- df[-splitIndex,]
+
+trControl = trainControl(method = &quot;cv&quot;,
+                         number = 7)
+
+tuneGrid = expand.grid(mtry = 2:4,
+                       splitrule = c(&#39;gini&#39;, &#39;extratrees&#39;),
+                       min.node.size = c(1:10))
+
+forest_model &lt;- train(target~., data=df_train, 
+                    method = &quot;ranger&quot;, 
+                    trControl = trControl,
+                    tuneGrid = tuneGrid)
+
+pred &lt;- predict(forest_model, df_test)
+cm1 &lt;- confusionMatrix(data = pred, reference = df_test$target, positive = &quot;pos&quot;)
+
+cm1$overall[1]</code></pre>
+<pre><code>##  Accuracy 
+## 0.7826087</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Use the <code>PimaIndiansDiabetes</code> dataset. Go to <a href="https://topepo.github.io/caret/available-models.html" class="uri">https://topepo.github.io/caret/available-models.html</a> and
+pick a classification model. Tune the classification model using
+cross-validation of 7 folds.</li>
+</ol>
+<pre class="r"><code>trControl = trainControl(method = &quot;cv&quot;, number = 7)
+
+class_model &lt;- train(target ~ ., data = df_train, method = &quot;OneR&quot;, trControl = trControl)
+
+pred &lt;- predict(class_model, df_test)
+cm &lt;- confusionMatrix(data = pred, reference = df_test$target, positive = &quot;pos&quot;)
+
+cm$overall[1]</code></pre>
+<pre><code>##  Accuracy 
+## 0.7217391</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li>(Model Comparison) Use the <code>PimaIndiansDiabetes</code> dataset.
+Pick two models at <a href="https://topepo.github.io/caret/available-models.html">this
+link</a> to compare using 7-fold cross validation method. Evaluate the
+accuracy of the final model on the test data.</li>
+</ol>
+<pre class="r"><code>library(ipred)
+library(plyr)
+library(e1071)
+
+trControl = trainControl(method = &quot;cv&quot;, number = 7)
+
+treebag_model &lt;- train(target ~ ., data = df_train, method = &quot;treebag&quot;, trControl = trControl)
+
+pred &lt;- predict(treebag_model, df_test)
+cm &lt;- confusionMatrix(data = pred, reference = df_test$target, positive = &quot;pos&quot;)
+
+cm$overall[1]</code></pre>
+<pre><code>##  Accuracy 
+## 0.7478261</code></pre>
+<pre class="r"><code>trControl = trainControl(method = &quot;cv&quot;, number = 7)
+
+svm_model &lt;- train(target ~ ., data = df_train, method = &quot;svmLinear&quot;, trControl = trControl)
+
+pred &lt;- predict(svm_model, df_test)
+
+cm &lt;- confusionMatrix(data = pred, reference = df_test$target, positive = &quot;pos&quot;)
+
+cm$overall[1]</code></pre>
+<pre><code>## Accuracy 
+## 0.773913</code></pre>
 
 
 
