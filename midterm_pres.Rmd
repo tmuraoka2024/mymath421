@@ -1,0 +1,184 @@
+---
+title: "Midterm Presentation"
+author: "Trey Muraoka"
+date: "`r Sys.Date()`"
+output: ioslides_presentation
+theme: "metropolis" 
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+```
+
+```{r, include=FALSE}
+library(tidyr)
+library(tidyverse)
+library(ggplot2)
+library(gganimate)
+df <- read_csv('midterm_season.csv', show_col_types = FALSE)
+```
+
+
+## Dataset Features
+
+```{r}
+names(df)
+```
+
+## Age Feature Distribution
+
+```{r, echo = FALSE}
+df %>%
+  mutate(sex = as.factor(sex)) %>%
+  filter(sex != 9) %>%
+  ggplot(aes(x = sex, y = age)) +
+  geom_boxplot(fill = "salmon", color = "darkblue") +
+  labs(
+    title = "Age Value Distribution by Sex",
+    x = "Sex",
+    y = "Age",
+    caption = '1 - Male\n2 - Female'
+  ) + 
+  theme_minimal()
+```
+
+
+## Age Distribution Pt.2
+
+```{r, echo = FALSE}
+df %>%
+  filter(sex != 9) %>%
+  drop_na() %>%
+  mutate(sex = as.factor(sex)) %>%
+  ggplot(aes(x = age, fill = sex)) +
+  geom_histogram() + 
+  scale_x_continuous(limits = c(0, 110)) +
+  labs(title = 'Histogram of Age by Sex',
+       x = 'Age',
+       y = 'Frequency',
+       caption = '1 - Male, 2 - Female') +
+  theme_minimal()
+```
+
+## LOS Distribution
+
+```{r, echo = FALSE}
+df %>%
+  mutate(sex = as.factor(sex)) %>%
+  filter(sex != 9) %>%
+  ggplot(aes(x = sex, y = los)) +
+  geom_boxplot(fill = "salmon", color = "darkblue") +
+  labs(
+    title = "Age Value Distribution by Sex",
+    x = "Sex",
+    y = "Length of Stay",
+    caption = 'Mean LOS: 4.9'
+  ) + 
+  theme_minimal()
+```
+
+## LOS Distribution Pt.2
+
+```{r}
+df %>%
+  group_by(age) %>%
+  summarise(mean_los = mean(los)) %>%
+  arrange(-mean_los) %>%
+  ggplot(aes(x = age, y = mean_los)) +
+  geom_bar(stat='identity', fill = "dodgerblue", width = 0.7) +
+  geom_hline(yintercept = mean(df$los), linetype = "dashed", color = "red") +
+  labs(
+    title = 'Histogram of Age by Average Length of Stay',
+    x = 'Age',
+    y = 'Length of Stay',
+    caption = 'LOS increases in low to mid 10s.'
+  ) +
+  theme_minimal()
+```
+
+
+## Charges Per Provider
+
+```{r}
+df %>%
+  mutate(provider = as.factor(provider),
+         age = as.numeric(tot)) %>%
+  group_by(provider) %>%
+  summarise(mean_tot = mean(tot)) %>%
+  ggplot(aes(x=provider, y=mean_tot)) +
+  geom_bar(stat='identity', fill='darkgreen') + 
+   geom_hline(yintercept = mean(df$tot), linetype = "dashed", color = "red") +
+  labs(title = 'Average Totals by Provider',
+       x = 'Provider Code',
+       y = 'Mean Total',
+       caption = '7215 - Bradley
+                  7205 - Rhode Island Hospital
+                  7213 - Landmark Medical Center') + 
+  theme_minimal()
+```
+
+## Total Patients per Provider over Time
+
+```{r}
+df %>%
+  mutate(provider = as.factor(provider)) %>%
+  filter(yoa == 18) %>%
+  group_by(provider, moa) %>%
+  count() %>%
+  ggplot(aes(x = moa, y = n, color = provider)) +
+  geom_line() +
+  geom_text(aes(x = 6, y = max(n), label = provider), vjust = -0.5, hjust = 0.5, show.legend = TRUE) +
+  labs(title = 'Number of Patients by Month for Each Provider (2018)',
+       x = 'Month',
+       y = 'Count') +
+  scale_x_continuous(breaks = 1:12) + 
+  theme_minimal() +
+  transition_states(provider, transition_length = 3, state_length = 4) +
+  enter_fade() +
+  exit_fade()
+```
+
+## Cost Prediction Model
+
+- Predicting high, or low patient costs
+![](http://127.0.0.1:36265/chunk_output/s/4C82AE5E/ccd755yl31mzc/000012.png?resize=10)
+
+
+## Cost Prediction Model Performance
+
+- rpart model
+- Pre hyperparamter tuning: 78.0%
+![](http://127.0.0.1:36265/chunk_output/s/4C82AE5E/c0gma4fft1v9m/000012.png?resize=10)
+
+```{r}
+print('Accuracy: 0.8333777')
+```
+
+
+## Length of Stay Prediction Model
+
+- Predicting short, or long patient visits
+![](http://127.0.0.1:36265/chunk_output/s/4C82AE5E/cdyi07yjm8mrj/000012.png?resize=10)
+
+## LOS Prediction Model Performance
+
+- rpart model
+- Pre hyperparamter tuning: 79.0%
+![](http://127.0.0.1:36265/chunk_output/s/4C82AE5E/cq2yo8y6gwp58/000012.png?resize=10)
+
+```{r}
+print('Accuracy: 0.8475311')
+```
+
+## Model Building Reflection
+
+- Both models were efficient, accurate
+- Would liked to have explored more features 
+- Future Linear Regression Model
+
+## Thank You
+
+- Questions?
+
+
+
