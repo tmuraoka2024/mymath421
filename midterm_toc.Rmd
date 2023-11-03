@@ -385,7 +385,7 @@ df_wSeason %>%
   labs(title = 'Total Visits per Season',
        x = 'Season',
        y = 'Count',
-       caption = '') + 
+       caption = 'Counts by season do not seem to change by season.') + 
   theme_minimal()
 ```
 
