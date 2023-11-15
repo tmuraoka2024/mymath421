@@ -1,4 +1,9 @@
-# Math 421: Statistical Analysis with R
+---
+title: "Math 421: Statistical Analysis with R"
+output:
+  html_document:
+    theme: flatly
+---
 
 ## Trey Muraoka
 
@@ -23,3 +28,5 @@
 - [Midterm Assignment](midterm_toc.html)
 - [Midterm Presentation](midterm_pres.html)
 - [Assignment 13](assignment13.html)
+- [Assignment 14](assignment14.html)
+- [Assignment 14 Extra Credit](assignment14_extra.html)
