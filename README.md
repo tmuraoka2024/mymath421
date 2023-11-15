@@ -1,9 +1,4 @@
----
-title: "Math 421: Statistical Analysis with R"
-output:
-  html_document:
-    theme: flatly
----
+# Math 421: Statistical Analysis with R
 
 ## Trey Muraoka
 
