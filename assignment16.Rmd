@@ -1,0 +1,227 @@
+
+---
+output: 
+  html_document:
+  pdf_document: default
+  word_document: default
+title: "Assignment 16: Writing a function - Loop"
+---
+
+***How to do it?***: 
+
+- Open the Rmarkdown file of this assignment ([link](assignment16.Rmd)) in Rstudio. 
+
+- Right under each **question**, insert  a code chunk (you can use the hotkey `Ctrl + Alt + I` to add a code chunk) and code the solution for the question. 
+
+- `Knit` the rmarkdown file (hotkey: `Ctrl + Alt + K`) to export an html.  
+
+-  Publish the html file to your Githiub Page. 
+
+***Submission***: Submit the link on Github of the assignment to Canvas
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE)
+```
+
+-------
+
+1. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: a data frame with all the missing of numeric variables replaced by the associated means.
+
+Hint: [Similar function](https://bryantstats.github.io/math421/gganimate/18_writing_functions.html#28)
+
+```{r}
+df_missing_func <- function(df) {
+  for (i in seq_along(df)) {
+    if (is.numeric(df[[i]])) {
+      df[[i]] <- ifelse(is.na(df[[i]]), mean(df[[i]], na.rm = TRUE), df[[i]])
+    }
+  }
+  return(df)
+}
+```
+
+```{r}
+example_df <- data.frame(
+  A = c(1, 2, NA, 4, 5),
+  B = c(NA, 2, 3, 4, 5),
+  C = c("No", NA, "Yes", NA, "No")
+)
+new_example_df <- df_missing_func(example_df)
+
+print(new_example_df)
+```
+
+-------
+
+2. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: a data frame with all the missing of variables replaced by the associated means (for numeric variables) or modes (for non-numeric variables).
+
+Hint: Use If-statement to combine the function in Problem 1 and the function in [this example](https://bryantstats.github.io/math421/gganimate/18_writing_functions.html#28)
+
+```{r}
+df_missing_func2 <- function(df) {
+  library(zoo)
+  for (i in seq_along(df)) {
+    if (is.numeric(df[[i]])) {
+      df[[i]] <- ifelse(is.na(df[[i]]), mean(df[[i]], na.rm = TRUE), df[[i]])
+    }
+    else if (!is.numeric(df[[i]])) {
+      mode_val <- names(sort(-table(df[[i]])))[1]
+      df[[i]] <- na.fill(df[[i]], fill = mode_val)
+    }
+  }
+  return(df)
+}
+```
+
+```{r}
+example_df <- data.frame(
+  A = c(1, 2, NA, 4, 5),
+  B = c(NA, 2, 3, 4, 5),
+  C = c("No", NA, "Yes", NA, "No")
+)
+new_example_df <- df_missing_func2(example_df)
+
+print(new_example_df)
+```
+
+-------
+
+3. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: Bar plots of all non-numeric variables
+
+Hint: [Similar function](https://bryantstats.github.io/math421/gganimate/18_writing_functions.html#33)
+
+```{r}
+df_bar_plot <- function(df) {
+  library(ggplot2)
+  library(dplyr)
+  
+  for (col_name in names(df)) {
+    if (!is.numeric(df[[col_name]])) {
+      plot_object <- df %>%
+        ggplot(aes(x = .data[[col_name]])) +
+        geom_bar(fill = "dodgerblue")
+      
+      print(plot_object)
+    }
+  }
+}
+```
+
+```{r}
+example_df <- data.frame(
+  Category = c("A", "B", "C", "A", "B"),
+  Count = c(10, 15, 8, 12, 20),
+  Status = c("Yes", "No", "Yes", "No", "Yes")
+)
+
+df_bar_plot(example_df)
+```
+
+-------
+
+4. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: all possible the bar plots of a non-numeric variable filled by a non-numeric variable.
+
+Hint: [Similar function](https://bryantstats.github.io/math421/gganimate/18_writing_functions.html#40)
+
+```{r}
+df_bar_plot2 <- function(df){
+library(ggplot2)
+  l <- length(df)
+  for (i in 1:(l-1))
+    for (j in (i+1):l)
+  {
+    if ((!is.numeric(df[[i]])) & (!is.numeric(df[[j]])))
+    {
+      print(ggplot(df, aes(x = df[[i]], fill = df[[j]])) + 
+              geom_bar(position = 'fill')+
+              labs(x = names(df)[i], fill = names(df)[j]))
+    }
+  }
+}
+```
+
+```{r}
+example_df <- data.frame(
+  Category = c("A", "B", "C", "A", "B"),
+  Count = c(10, 15, 8, 12, 20),
+  Status = c("Yes", "No", "Yes", "No", "Yes")
+)
+
+df_bar_plot2(example_df)
+```
+
+
+-------
+
+5. Write the following function. Give examples to test your function.
+
+- Input: a data frame
+
+- Output: 
+
+  - all possible the bar plots of a non-numeric variable filled by a non-numeric variable.
+  
+  - all possible the density plots of a numeric variable colored by a non-numeric variable
+  
+  - all possible the scatter plots.
+  
+
+Hint: Combine [this function](https://bryantstats.github.io/math421/gganimate/18_writing_functions.html#37), [this function](https://bryantstats.github.io/math421/gganimate/18_writing_functions.html#40), and the function in Question 4. One way to combine is creating a new function, `quick_plot`, and call these three functions within `quick_plot`. 
+
+```{r}
+quick_plot <- function(df){
+library(ggplot2)
+  l <- length(df)
+  for (i in 1:(l-1))
+    for (j in (i+1):l)
+  {
+     if (is.numeric(df[[i]])&is.numeric(df[[j]]))
+    {
+      print(ggplot(df, aes(x = df[[i]], y = df[[j]]))+ 
+              geom_point()+
+              labs(x = names(df)[i], y = names(df)[j]))
+     }
+     else if (is.numeric(df[[i]])& (!is.numeric(df[[j]])))
+    {
+      print(ggplot(df, aes(x = df[[i]], color = df[[j]]))+ 
+              geom_density()+labs(x = names(df)[i], color = names(df)[j]))
+     }
+      else if ((!is.numeric(df[[i]])) & (!is.numeric(df[[j]])))
+    {
+      print(ggplot(df, aes(x = df[[i]], fill = df[[j]])) + 
+              geom_bar(position = 'fill')+
+              labs(x = names(df)[i], fill = names(df)[j]))
+    }
+  }
+}
+```
+
+```{r}
+example_df <- data.frame(
+  Age = c(25, 30, 22, 35, 28),
+  Income = c(50000, 60000, 45000, 70000, 55000),
+  Gender = c("Male", "Female", "Male", "Female", "Male"),
+  Education = c("High School", "College", "High School", "Graduate", "College")
+)
+
+quick_plot(example_df)
+```
+
+
+
