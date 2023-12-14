@@ -201,7 +201,7 @@ Present your dashboard in Question 10 on the final exam day.
 
 -   Give an advice for anyone who is about to do this project
 
-- [Presentation]
+- [Presentation](finalPresentation.html)
 
 ------------------------------------------------------------------------
 
