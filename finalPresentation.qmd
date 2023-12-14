@@ -1,0 +1,25 @@
+---
+title: "Final Presentation"
+format: revealjs
+editor: visual
+---
+
+## Dashboard Walkthrough
+
+<https://tmuraoka20244.shinyapps.io/finalDashboardv2/>
+
+## Errors and Challenges
+
+-   Making filtered column tabs on different main tabs.
+
+-   Having the input filters affect dashboard visuals.
+
+-   Finding a suitable data set.
+
+## Future Advice
+
+-   Gradually build personal dashboard through each practice.
+
+-   Go step by step, don't take on too much at once.
+
+-   Take more time in choosing your data set.

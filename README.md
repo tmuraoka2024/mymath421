@@ -28,3 +28,5 @@
 - [Assignment 15](assignment15.html)
 - [Assignment 16](assignment16.html)
 - [Assignment 17](assignment17.html)
+- [Final Assignment](final.html)
+- [Final Presentation](finalPresentation.html)
