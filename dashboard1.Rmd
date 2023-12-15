@@ -1,0 +1,143 @@
+
+---
+title: "Adult Census Data"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    source_code: embed
+    social: menu
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(knitr)
+library(DT)
+df <- read_csv('adult_census_missing.csv')
+
+# Create a ggplot object
+p <- df %>%
+  filter(education != "NA", education != "Not Known", education != "Unknown") %>%
+  group_by(education, income) %>%
+  count() %>%
+  arrange(-n) %>%
+  ggplot(aes(y = education, x = n, fill = income)) +
+  geom_bar(stat = 'identity') +
+  labs(x = 'Count', 
+       y = 'Education Level')
+
+p1 <- df %>%
+  group_by(income, sex) %>%
+  count() %>%
+  arrange(-n) %>%
+  ggplot(aes(x = income, y = n, fill = sex)) +
+  geom_bar(stat = 'identity') +
+  labs(x = 'Income Level', 
+       y = 'Count')
+
+p2 <- df %>%
+  filter(education != "NA", education != "Not Known", education != "Unknown") %>%
+  group_by(race, income) %>%
+  count() %>%
+  arrange(-n) %>%
+  ggplot(aes(y = race, x = n, fill = income)) +
+  geom_bar(stat = 'identity') +
+  labs(x = 'Count', 
+       y = 'Race')
+```
+
+{.sidebar}
+=======================================================================
+
+### 1. Brief Dataset Description
+
+This dataset includes personal census data for individuals such as, age, workclass, education, marital staus and income. 
+
+### 2. Flexdashboard and Plotly
+
+This interactive uses `flexdashboard` and `plotly` to visualize the data. 
+
+Main Tab 1
+=======================================================================
+
+Column {data-width=500, .tabset}
+-----------------------------------------------------------------------
+
+### Raw Income Data
+
+```{r}
+df$income
+```
+
+
+### Raw Dataset
+
+```{r}
+df
+```
+
+
+### Formatted Dataset
+
+```{r}
+datatable(df, options = list(
+  pageLength = 25
+))
+```
+
+
+Column {data-width=750}
+-----------------------------------------------------------------------
+
+### Income Distribution by Sex
+
+```{r}
+p1
+```
+
+### Interactive Visual
+
+```{r}
+ggplotly(p1)
+```
+
+
+Main Tab 2
+=======================================================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Education Distribution by Income
+
+```{r}
+p
+```
+
+### Interactive Visual
+
+```{r}
+ggplotly(p)
+```
+
+Main Tab 3
+=======================================================================
+
+Column {data-width=500}
+-----------------------------------------------------------------------
+
+### Education Distribution by Income
+
+```{r}
+p2
+```
+
+### Interactive Visual
+
+```{r}
+ggplotly(p2)
+```
+
+
